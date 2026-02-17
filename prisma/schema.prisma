@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// AYAM GEPREK SAMBAL IJO - Database Schema
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +9,198 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  username        String   @unique
+  email           String   @unique
+  password        String
+  phone           String
+  address         String?
+  photo           String?
+  memberLevel     String   @default("Silver") // Silver, Gold, Platinum
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  wallet          WalletSaldo?
+  transactions    Transaksi[]
+  cartItems       CartItem[]
+  redeemHistory   RedeemHistory[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Admin model
+model Admin {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  phone       String
+  birthDate   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Produk model
+model Produk {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Int
+  category    String // Makanan, Minuman
+  image       String?
+  isPromo     Boolean  @default(false)
+  isDiscount  Boolean  @default(false)
+  discount    Int?
+  isNew       Boolean  @default(false)
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  cartItems   CartItem[]
+  transaksiItems TransaksiItem[]
+}
+
+// Produk Point model
+model ProdukPoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  pointPrice  Int
+  image       String?
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  redeemHistory RedeemHistory[]
+}
+
+// Redeem Code model
+model RedeemCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  pointValue  Int
+  expiryDate  DateTime?
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  redeemHistory RedeemHistory[]
+}
+
+// Redeem History model
+model RedeemHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  codeId      String?
+  productId   String?
+  pointUsed   Int
+  description String?
+  createdAt   DateTime @default(now())
+  
+  user        User       @relation(fields: [userId], references: [id])
+  code        RedeemCode? @relation(fields: [codeId], references: [id])
+  product     ProdukPoint? @relation(fields: [productId], references: [id])
+}
+
+// Wallet Saldo model
+model WalletSaldo {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  balance     Int      @default(0)
+  points      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User             @relation(fields: [userId], references: [id])
+  history     WalletHistory[]
+}
+
+// Wallet History model
+model WalletHistory {
+  id          String   @id @default(cuid())
+  walletId    String
+  type        String   // topup, redeem, cashback, transaction, referral
+  amount      Int
+  points      Int?
+  description String?
+  createdAt   DateTime @default(now())
+  
+  wallet      WalletSaldo @relation(fields: [walletId], references: [id])
+}
+
+// Transaksi model
+model Transaksi {
+  id          String   @id @default(cuid())
+  userId      String
+  userName    String
+  userPhone   String
+  userAddress String
+  total       Int
+  walletUsed  Int      @default(0)
+  status      String   // Menunggu, Diproses, Selesai, Cancel
+  whatsappMessage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User            @relation(fields: [userId], references: [id])
+  items       TransaksiItem[]
+  struk       Struk?
+}
+
+// Transaksi Item model
+model TransaksiItem {
+  id            String   @id @default(cuid())
+  transaksiId   String
+  produkId      String
+  productName   String
+  productPrice  Int
+  quantity      Int
+  subtotal      Int
+  createdAt     DateTime @default(now())
+  
+  transaksi     Transaksi @relation(fields: [transaksiId], references: [id])
+  produk        Produk    @relation(fields: [produkId], references: [id])
+}
+
+// Struk model
+model Struk {
+  id          String   @id @default(cuid())
+  transaksiId String   @unique
+  data        String   // JSON data
+  printed     Boolean  @default(false)
+  downloaded  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  transaksi   Transaksi @relation(fields: [transaksiId], references: [id])
+}
+
+// Cart Item model
+model CartItem {
+  id          String   @id @default(cuid())
+  userId      String
+  produkId    String
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User   @relation(fields: [userId], references: [id])
+  produk      Produk @relation(fields: [produkId], references: [id])
+  
+  @@unique([userId, produkId])
+}
+
+// Profile Toko model
+model ProfileToko {
+  id          String   @id @default(cuid())
+  name        String
+  slogan      String
+  address     String
+  phone       String
+  instagram   String?
+  facebook    String?
+  pointRate   Int      @default(100) // 1 Point = Rp 100
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
