@@ -273,52 +273,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Header Info Bar - Address & Contact */}
-        <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white py-2 px-4">
-          <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
-              {/* Address */}
-              <div className="flex items-center gap-2 text-orange-50">
-                <span className="hidden sm:inline">📍</span>
-                <span className="text-center md:text-left">
-                  Jl. Medan - Banda Aceh, Simpang Camat, Gampong Tijue, Kec. Pidie, Kab. Pidie, 24151
-                </span>
-              </div>
-              
-              {/* Contact */}
-              <div className="flex items-center gap-4">
-                <a 
-                  href="https://instagram.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-orange-200 transition-colors"
-                >
-                  <Instagram className="w-4 h-4" />
-                  <span className="hidden sm:inline">Instagram</span>
-                </a>
-                <a 
-                  href="https://facebook.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-orange-200 transition-colors"
-                >
-                  <Facebook className="w-4 h-4" />
-                  <span className="hidden sm:inline">Facebook</span>
-                </a>
-                <a 
-                  href="https://wa.me/6285260812758" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-orange-200 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>085260812758</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Mobile Search */}
         <div className="mt-3 sm:hidden container mx-auto px-4">
           <div className="relative">
